@@ -1,0 +1,45 @@
+
+
+=============REDHAT EX180===================
+
+Question1: Creating Custom Webserver using java --> web file is to be run in order to run
+                    the app server ,then App Server like JBOSS is needed to run appserver.
+
+
+
+
+
+wget https://download.jboss.org/wildfly/23.0.1.Final/wildfly-23.0.1.Final.tar.gz
+#after writing each line test it.
+# 8080, 9990,9999 is the default port of JBOSS
+
+
+vim Dockerfile
+---------------------------------------------------------
+FROM  jboss/base-jdk:11
+
+#workdit /opt/jboss
+COPY  wildfly-23.0.1.Final.tar.gz .
+
+RUN  tar -xzvf wildfly-23.0.1.Final.tar.gz
+
+ENV JBOSS_HOME /opt/jboss/wildfly-23.0.1.Final
+
+ENV LAUNCH_JBOSS_IN_BACKGROUND true
+
+USER jboss
+
+EXPOSE 8080
+EXPOSE 9990
+EXPOSE 9999
+
+#to give the User and Password for the JBOSS gui portal 
+RUN  /opt/jboss/wildfly-23.0.1.Final/bin/add-user.sh admin Admin#70365 --silent
+
+#to start the JBOSS service
+CMD ["/opt/jboss/wildfly-23.0.1.Final/bin/standalone.sh", "-b", "0.0.0.0", "-bmanagement", "0.0.0.0"]
+---------------------------
+
+docker build -t webapp:latest .
+
+podman run -it -p 8080:8080 -p 9990:9990 webapp:latest
